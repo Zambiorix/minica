@@ -1,3 +1,3 @@
-module github.com/jsha/minica
+module github.com/Zambiorix/minica
 
-go 1.13
+go 1.22
