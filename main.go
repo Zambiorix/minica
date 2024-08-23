@@ -13,7 +13,6 @@ import (
 	"encoding/pem"
 	"flag"
 	"fmt"
-	"io/ioutil"
 	"log"
 	"math"
 	"math/big"
@@ -37,8 +36,8 @@ type issuer struct {
 }
 
 func getIssuer(keyFile, certFile string) (*issuer, error) {
-	keyContents, keyErr := ioutil.ReadFile(keyFile)
-	certContents, certErr := ioutil.ReadFile(certFile)
+	keyContents, keyErr := os.ReadFile(keyFile)
+	certContents, certErr := os.ReadFile(certFile)
 	if os.IsNotExist(keyErr) && os.IsNotExist(certErr) {
 		err := makeIssuer(keyFile, certFile)
 		if err != nil {
@@ -108,9 +107,6 @@ func makeKey(filename string) (*rsa.PrivateKey, error) {
 		return nil, err
 	}
 	der := x509.MarshalPKCS1PrivateKey(key)
-	if err != nil {
-		return nil, err
-	}
 	file, err := os.OpenFile(filename, os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
 	if err != nil {
 		return nil, err
@@ -192,7 +188,7 @@ func publicKeysEqual(a, b interface{}) (bool, error) {
 	if err != nil {
 		return false, err
 	}
-	return bytes.Compare(aBytes, bBytes) == 0, nil
+	return bytes.Equal(aBytes, bBytes), nil
 }
 
 func calculateSKID(pubKey crypto.PublicKey) ([]byte, error) {
